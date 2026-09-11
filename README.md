@@ -1,5 +1,7 @@
 # Project Full-Stack: Modul Login & Management Access (RBAC)
 
+Repository GitHub: [https://github.com/ardyansyahp/dataintegrasi](https://github.com/ardyansyahp/dataintegrasi)
+
 Aplikasi full-stack untuk studi kasus tes backend developer & modul Login & Management Access terintegrasi.
 
 ## 🌟 Fitur Utama
