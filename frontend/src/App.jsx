@@ -3,7 +3,6 @@ import { api } from './services/api';
 import LoginPage from './pages/LoginPage';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
-import DashboardHome from './pages/DashboardHome';
 import MenuManagement from './pages/MenuManagement';
 import RoleManagement from './pages/RoleManagement';
 import UserManagement from './pages/UserManagement';
@@ -19,11 +18,44 @@ export default function App() {
 
   // Dynamic Menus for current active role
   const [menus, setMenus] = useState([]);
-  const [currentPath, setCurrentPath] = useState('/');
+  const [currentPath, setCurrentPath] = useState('');
   const [activeMenuData, setActiveMenuData] = useState(null);
 
   // Switch role modal state
   const [isSwitchRoleOpen, setIsSwitchRoleOpen] = useState(false);
+
+  // Helper function to find first executable menu with URL
+  const findFirstMenu = (menuList) => {
+    if (!menuList || menuList.length === 0) return null;
+    for (const item of menuList) {
+      if (item.url) return item;
+      if (item.children && item.children.length > 0) {
+        const childMatch = findFirstMenu(item.children);
+        if (childMatch) return childMatch;
+      }
+    }
+    return menuList[0];
+  };
+
+  // Fetch menus for current active role
+  const fetchRoleMenus = async () => {
+    try {
+      const res = await api.getMyMenus();
+      if (res.success) {
+        const fetchedMenus = res.data || [];
+        setMenus(fetchedMenus);
+
+        // Auto select first available menu for the role if current path is empty or root
+        const firstAvailable = findFirstMenu(fetchedMenus);
+        if (firstAvailable && (!currentPath || currentPath === '/')) {
+          setCurrentPath(firstAvailable.url || '');
+          setActiveMenuData(firstAvailable);
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching role menus:', err);
+    }
+  };
 
   // Initial check on load
   useEffect(() => {
@@ -55,25 +87,13 @@ export default function App() {
     initAuth();
   }, []);
 
-  // Fetch menus for current active role
-  const fetchRoleMenus = async () => {
-    try {
-      const res = await api.getMyMenus();
-      if (res.success) {
-        setMenus(res.data || []);
-      }
-    } catch (err) {
-      console.error('Error fetching role menus:', err);
-    }
-  };
-
-  const handleLoginSuccess = (loggedUser, loggedRole, userRoles) => {
+  const handleLoginSuccess = async (loggedUser, loggedRole, userRoles) => {
     setUser(loggedUser);
     setActiveRole(loggedRole);
     setRoles(userRoles);
     setToken(localStorage.getItem('token'));
-    setCurrentPath('/');
-    fetchRoleMenus();
+    setCurrentPath('');
+    await fetchRoleMenus();
   };
 
   const handleLogout = () => {
@@ -86,7 +106,8 @@ export default function App() {
     setRoles([]);
     setToken(null);
     setMenus([]);
-    setCurrentPath('/');
+    setCurrentPath('');
+    setActiveMenuData(null);
   };
 
   const handleSwitchRole = async (newRoleId) => {
@@ -97,7 +118,7 @@ export default function App() {
         localStorage.setItem('activeRole', JSON.stringify(res.activeRole));
         setActiveRole(res.activeRole);
         setIsSwitchRoleOpen(false);
-        setCurrentPath('/');
+        setCurrentPath('');
         await fetchRoleMenus();
       } else {
         alert(res.message || 'Gagal mengganti role');
@@ -129,7 +150,7 @@ export default function App() {
   // Main Dashboard View (Wireframe 2 & 3)
   return (
     <div className="app-layout-container">
-      {/* Wireframe 3: Sidebar */}
+      {/* Sidebar without dummy Homepage */}
       <Sidebar
         menus={menus}
         currentPath={currentPath}
@@ -138,7 +159,7 @@ export default function App() {
       />
 
       <div className="app-main-area">
-        {/* Wireframe 2: Navbar */}
+        {/* Navbar */}
         <Navbar
           user={user}
           activeRole={activeRole}
@@ -149,15 +170,6 @@ export default function App() {
 
         {/* Content View */}
         <main className="app-page-body">
-          {currentPath === '/' && (
-            <DashboardHome
-              user={user}
-              activeRole={activeRole}
-              roles={roles}
-              onNavigate={handleNavigate}
-            />
-          )}
-
           {currentPath === '/management/menus' && (
             <MenuManagement onMenuUpdated={fetchRoleMenus} />
           )}
@@ -170,9 +182,8 @@ export default function App() {
             <UserManagement />
           )}
 
-          {/* Fallback for Dynamic Menus (Menu 1, Menu 1.1, etc.) */}
-          {currentPath !== '/' &&
-            currentPath !== '/management/menus' &&
+          {/* Dynamic Menu View for menu items */}
+          {currentPath !== '/management/menus' &&
             currentPath !== '/management/roles' &&
             currentPath !== '/management/users' && (
               <DynamicMenuView

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Home,
   Database,
   Layers,
   Users,
@@ -41,7 +40,6 @@ const renderIcon = (iconName, size = 18) => {
 // Recursive Menu Item Component for Unlimited Hierarchy
 function RecursiveMenuItem({ item, level = 0, currentPath, onNavigate }) {
   const hasChildren = item.children && item.children.length > 0;
-  // Default open top-level menus or open state
   const [isOpen, setIsOpen] = useState(level < 1 || item.menu_name.includes('Menu 1'));
 
   const isActive = currentPath === item.url;
@@ -92,7 +90,6 @@ function RecursiveMenuItem({ item, level = 0, currentPath, onNavigate }) {
 }
 
 export default function Sidebar({ menus = [], currentPath, onNavigate, activeRole }) {
-  // Pisahkan Master items dan Menu 1/2/3 items jika diperlukan, atau render secara hierarkis
   return (
     <aside className="app-sidebar">
       {/* Top Logo */}
@@ -102,19 +99,10 @@ export default function Sidebar({ menus = [], currentPath, onNavigate, activeRol
 
       {/* Main Navigation */}
       <div className="sidebar-content">
-        {/* Wireframe 3: Black pill Homepage */}
-        <div
-          className={`btn-homepage-pill ${currentPath === '/' ? 'active' : ''}`}
-          onClick={() => onNavigate('/', { menu_name: 'Homepage', url: '/' })}
-        >
-          <Home size={19} className="homepage-icon" />
-          <span className="homepage-text">Homepage</span>
-        </div>
-
         {/* Dynamic Multi-level Menus from Database (RBAC) */}
         <div className="sidebar-menu-list">
           {menus.length === 0 ? (
-            <div className="empty-menu-notice">Tidak ada menu untuk role ini.</div>
+            <div className="empty-menu-notice p-4 text-xs text-gray-400">Tidak ada menu untuk role ini.</div>
           ) : (
             menus.map((menu) => (
               <RecursiveMenuItem
