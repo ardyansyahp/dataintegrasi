@@ -42,7 +42,10 @@ function RecursiveMenuItem({ item, level = 0, currentPath, onNavigate }) {
   const hasChildren = item.children && item.children.length > 0;
   const [isOpen, setIsOpen] = useState(level < 1 || item.menu_name.includes('Menu 1'));
 
-  const isActive = currentPath === item.url;
+  // Compare normalized paths so active state is reliably highlighted
+  const normCurrent = (currentPath || '').trim().toLowerCase().replace(/\/$/, '');
+  const normUrl = (item.url || '').trim().toLowerCase().replace(/\/$/, '');
+  const isActive = Boolean(normCurrent && normUrl && normCurrent === normUrl);
 
   const handleClick = (e) => {
     e.stopPropagation();
@@ -99,7 +102,6 @@ export default function Sidebar({ menus = [], currentPath, onNavigate, activeRol
 
       {/* Main Navigation */}
       <div className="sidebar-content">
-        {/* Dynamic Multi-level Menus from Database (RBAC) */}
         <div className="sidebar-menu-list">
           {menus.length === 0 ? (
             <div className="empty-menu-notice p-4 text-xs text-gray-400">Tidak ada menu untuk role ini.</div>

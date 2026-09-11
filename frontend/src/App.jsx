@@ -38,16 +38,15 @@ export default function App() {
   };
 
   // Fetch menus for current active role
-  const fetchRoleMenus = async () => {
+  const fetchRoleMenus = async (autoSelectFirst = true) => {
     try {
       const res = await api.getMyMenus();
       if (res.success) {
         const fetchedMenus = res.data || [];
         setMenus(fetchedMenus);
 
-        // Auto select first available menu for the role if current path is empty or root
         const firstAvailable = findFirstMenu(fetchedMenus);
-        if (firstAvailable && (!currentPath || currentPath === '/')) {
+        if (firstAvailable && autoSelectFirst) {
           setCurrentPath(firstAvailable.url || '');
           setActiveMenuData(firstAvailable);
         }
@@ -72,7 +71,7 @@ export default function App() {
           setUser(res.user);
           setActiveRole(res.activeRole);
           setRoles(res.roles || []);
-          await fetchRoleMenus();
+          await fetchRoleMenus(true);
         } else {
           handleLogout();
         }
@@ -92,8 +91,7 @@ export default function App() {
     setActiveRole(loggedRole);
     setRoles(userRoles);
     setToken(localStorage.getItem('token'));
-    setCurrentPath('');
-    await fetchRoleMenus();
+    await fetchRoleMenus(true);
   };
 
   const handleLogout = () => {
@@ -118,8 +116,7 @@ export default function App() {
         localStorage.setItem('activeRole', JSON.stringify(res.activeRole));
         setActiveRole(res.activeRole);
         setIsSwitchRoleOpen(false);
-        setCurrentPath('');
-        await fetchRoleMenus();
+        await fetchRoleMenus(true);
       } else {
         alert(res.message || 'Gagal mengganti role');
       }
@@ -150,7 +147,6 @@ export default function App() {
   // Main Dashboard View (Wireframe 2 & 3)
   return (
     <div className="app-layout-container">
-      {/* Sidebar without dummy Homepage */}
       <Sidebar
         menus={menus}
         currentPath={currentPath}
@@ -159,7 +155,6 @@ export default function App() {
       />
 
       <div className="app-main-area">
-        {/* Navbar */}
         <Navbar
           user={user}
           activeRole={activeRole}
@@ -171,11 +166,11 @@ export default function App() {
         {/* Content View */}
         <main className="app-page-body">
           {currentPath === '/management/menus' && (
-            <MenuManagement onMenuUpdated={fetchRoleMenus} />
+            <MenuManagement onMenuUpdated={() => fetchRoleMenus(false)} />
           )}
 
           {currentPath === '/management/roles' && (
-            <RoleManagement onRoleUpdated={fetchRoleMenus} />
+            <RoleManagement onRoleUpdated={() => fetchRoleMenus(false)} />
           )}
 
           {currentPath === '/management/users' && (
