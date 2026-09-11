@@ -52,7 +52,7 @@ CREATE TABLE role_menus (
 
 -- =======================================================
 -- SEED DATA AWAL
--- Password default semua user: password123 ($2b$10$wEkgK/Qv377vT1sR4v0nfuWvjZ4mG7JjV8wF1a9CgDkFfR8Cq0iGy)
+-- Password default semua user: password123 (akan di-hash bcrypt via seed script)
 -- =======================================================
 
 -- Masukkan Roles
@@ -68,14 +68,12 @@ INSERT INTO users (id, username, password, full_name, is_active) VALUES
 (3, 'manager', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Siti Rahmawati', true);
 
 -- Masukkan User Roles (Karyawan Jabatan Ganda & Tunggal)
--- User 'admin' memiliki 2 role: Super Admin (1) & Manager (2) -> Untuk uji coba Multi-role
 INSERT INTO user_roles (user_id, role_id) VALUES
 (1, 1),
 (1, 2),
 (2, 3), -- 'staff' hanya memiliki role Staff Operasional (3)
 (3, 2); -- 'manager' memiliki role Manager (2)
 
--- Reset Sequence ID
 SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
 SELECT setval('roles_id_seq', (SELECT MAX(id) FROM roles));
 
@@ -83,17 +81,11 @@ SELECT setval('roles_id_seq', (SELECT MAX(id) FROM roles));
 -- SEED DATA STRUKTUR MENU UJI COBA (Sesuai Soal Interview)
 -- =======================================================
 
--- Level 0: Master Menu Utama Sesuai Wireframe 3
+-- Menu Management & System Administration (Root level)
 INSERT INTO menus (id, menu_name, url, parent_id, order_index, icon) VALUES
-(1, 'Master Data', '/master-data', NULL, 1, 'database'),
-(2, 'Sub Master', '/sub-master', NULL, 2, 'layers'),
-(3, 'Administration', '/admin', NULL, 3, 'users');
-
--- Sub Menu di bawah Administration
-INSERT INTO menus (id, menu_name, url, parent_id, order_index, icon) VALUES
-(4, 'Menu Management', '/management/menus', 3, 1, 'list'),
-(5, 'Access Role Management', '/management/roles', 3, 2, 'shield'),
-(6, 'User Management', '/management/users', 3, 3, 'user-check');
+(4, 'Menu Management', '/management/menus', NULL, 1, 'list'),
+(5, 'Access Role Management', '/management/roles', NULL, 2, 'shield'),
+(6, 'User Management', '/management/users', NULL, 3, 'user-check');
 
 -- Sesuai Catatan Soal: Struktur Menu Bertingkat (Menu 1, 2, 3)
 -- Menu 1
@@ -134,9 +126,9 @@ SELECT setval('menus_id_seq', 3000);
 INSERT INTO role_menus (role_id, menu_id)
 SELECT 1, id FROM menus;
 
--- Manager (Role 2): Mendapatkan Menu 1, Menu 2, Master Data
+-- Manager (Role 2): Mendapatkan Menu 1, Menu 2
 INSERT INTO role_menus (role_id, menu_id)
-SELECT 2, id FROM menus WHERE id IN (1, 100, 110, 120, 121, 122, 130, 131, 200, 210, 220, 221, 222, 2221, 2222, 223, 230);
+SELECT 2, id FROM menus WHERE id IN (100, 110, 120, 121, 122, 130, 131, 200, 210, 220, 221, 222, 2221, 2222, 223, 230);
 
 -- Staff Operasional (Role 3): Hanya Menu 1 dan Menu 3
 INSERT INTO role_menus (role_id, menu_id)

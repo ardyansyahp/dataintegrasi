@@ -111,9 +111,6 @@ export default function Sidebar({ menus = [], currentPath, onNavigate, activeRol
           <span className="homepage-text">Homepage</span>
         </div>
 
-        {/* Section Label: MASTER */}
-        <div className="sidebar-section-header">MASTER</div>
-
         {/* Dynamic Multi-level Menus from Database (RBAC) */}
         <div className="sidebar-menu-list">
           {menus.length === 0 ? (
