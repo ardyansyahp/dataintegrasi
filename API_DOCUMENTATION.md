@@ -7,6 +7,7 @@ Dirancang untuk integrasi frontend React.js dengan arsitektur **Role-Based Acces
 
 ## 1. Konfigurasi Server
 * **Base URL**: `http://localhost:5000/api`
+* **Swagger UI (Interactive Docs)**: `http://localhost:5000/api-docs`
 * **Database**: PostgreSQL (`localhost:5432`, Database: `dataintegrasi`, User: `postgres`)
 * **Header Autentikasi**: `Authorization: Bearer <JWT_TOKEN>`
 
