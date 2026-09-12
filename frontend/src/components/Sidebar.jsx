@@ -118,14 +118,6 @@ export default function Sidebar({ menus = [], currentPath, onNavigate, activeRol
           )}
         </div>
       </div>
-
-      {/* Footer info showing active role */}
-      <div className="sidebar-footer">
-        <div className="role-pill-indicator">
-          <span className="dot-green"></span>
-          <span className="role-pill-text">{activeRole?.role_name || 'Active Role'}</span>
-        </div>
-      </div>
     </aside>
   );
 }
