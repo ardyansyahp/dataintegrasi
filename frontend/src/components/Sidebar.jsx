@@ -40,7 +40,7 @@ const renderIcon = (iconName, size = 18) => {
 // Recursive Menu Item Component for Unlimited Hierarchy
 function RecursiveMenuItem({ item, level = 0, currentPath, onNavigate }) {
   const hasChildren = item.children && item.children.length > 0;
-  const [isOpen, setIsOpen] = useState(level < 1 || item.menu_name.includes('Menu 1'));
+  const [isOpen, setIsOpen] = useState(false);
 
   // Compare normalized paths so active state is reliably highlighted
   const normCurrent = (currentPath || '').trim().toLowerCase().replace(/\/$/, '');
